@@ -1,30 +1,30 @@
-const NhanVien = require("../../models/nhanvien.model.js");
-const Blacklist = require("../../models/blacklist.model.js");
+const KhachHang = require("../models/khachhang.model.js");
+const Blacklist = require("../models/blacklist.model.js");
 const jwt = require("jsonwebtoken");
 const md5 = require("md5");
 
-class adminAuth {
-  //[POST] /admin/dang-nhap
+class users {
+  //[POST] /users/login
   async login(req, res) {
     const { TaiKhoan, MatKhau } = req.body;
 
     try {
-      const nhanVien = await NhanVien.findOne({
+      const khachhang = await KhachHang.findOne({
         where: {
           TaiKhoan: TaiKhoan,
           MatKhau: md5(MatKhau)
         }
       });
 
-      if (!nhanVien) {
+      if (!khachhang) {
         return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu!" });
       }
 
-      const accessToken = jwt.sign({ MaNhanVien: nhanVien.MaNhanVien, ChucVu: nhanVien.ChucVu }, "SECRET_KEY", {
+      const accessToken = jwt.sign({ MaKhachHang: khachhang.MaKhachHang, ChucVu: 0 }, "SECRET_KEY", {
         expiresIn: "24h"
       });
 
-      const refreshToken = jwt.sign({ MaNhanVien: nhanVien.MaNhanVien }, "SECRET_KEY_REFRESH", {
+      const refreshToken = jwt.sign({ MaKhachHang: khachhang.MaKhachHang }, "SECRET_KEY_REFRESH", {
         expiresIn: "30d"
       });
 
@@ -34,7 +34,7 @@ class adminAuth {
     }
   }
 
-  //[POST] /admin/dang-xuat
+  //[POST] /users/logout
   async logout(req, res) {
     const token = req.header("Authorization").split(" ")[1];
     try {
@@ -54,4 +54,4 @@ class adminAuth {
   }
 }
 
-module.exports = new adminAuth();
+module.exports = new users();

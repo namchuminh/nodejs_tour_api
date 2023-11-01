@@ -1,5 +1,5 @@
 const { Op } = require('sequelize'); 
-const Tours = require("../../models/tour.model.js");
+const Tours = require("../models/tour.model.js");
 
 class tours {
     //[GET] /admin/tours
