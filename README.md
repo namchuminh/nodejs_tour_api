@@ -1,4 +1,4 @@
-# Cấu trúc thư mục dự án Node.js Rest APIs với Express & MySQL
+# HƯỚNG DẪN CÀI ĐẶT 
 
 ## Clone Repo
 ```
@@ -20,6 +20,12 @@ npm install --save-dev nodemon
 "scripts": {
   "start": "nodemon server.js"
 }
+```
+
+## MySQL Import
+```
+File name: nodejs_tour.sql
+Database name: nodejs_tour
 ```
 
 ### Run
