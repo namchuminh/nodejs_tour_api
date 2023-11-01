@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const methodOverride = require("method-override");
+const path = require('path');
 
 // Connect to database
 const sequelize = require('./app/config/db.config.js');
@@ -31,7 +32,7 @@ app.use(express.urlencoded({ extended: true })); /* bodyParser.urlencoded() is d
 
 // Middlewares
 app.use(methodOverride("_method"));
-app.use(express.static(__dirname + '/uploads'));
+app.use('/uploads',express.static(path.join(__dirname, 'uploads')));
 
 //Import route application
 const route = require("./app/routes/index.js")
