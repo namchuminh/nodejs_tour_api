@@ -26,6 +26,10 @@ const KhachHang = sequelize.define("khachhang", {
     MatKhau: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    TrangThai: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
   tableName: "khach_hang" 
