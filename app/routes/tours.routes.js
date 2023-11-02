@@ -6,6 +6,8 @@ const checkUploadedImage = require('../middlewares/checkUpload.middleware.js');
 const auth = require("../middlewares/auth.middleware.js");
 const authorization = require("../middlewares/authorization.middleware.js");
 
+router.delete('/:id', auth, authorization, tours.remove);
+router.put('/:id', auth, authorization, upload.single('AnhChinh'), tours.edit);
 router.post('/', auth, authorization, upload.single('AnhChinh'), checkUploadedImage, tours.add);
 router.get('/', tours.index);
 
