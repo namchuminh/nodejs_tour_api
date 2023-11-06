@@ -1,5 +1,7 @@
 const { Op } = require('sequelize'); 
 const Tours = require("../models/tour.model.js");
+const TourInformation = require("../models/thongtintour.model.js");
+const Destination = require("../models/diemden.model.js");
 
 class tours {
     //[GET] /tours
@@ -34,6 +36,27 @@ class tours {
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: "Đã xảy ra lỗi" });
+        }
+    }
+
+    //[GET] /tours/:id
+    async detail(req, res) {
+        try{
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                  MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+                        
+            return res.status(200).json({ data: tour });
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -143,6 +166,62 @@ class tours {
             res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
+
+    //[GET] /tours/:id/information
+    async detailInformation(req, res) {
+        try{
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                  MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+
+            const tourInformation = await TourInformation.findOne({
+                where: {
+                  MaTour: id
+                }
+            });
+
+            if(!tourInformation) return res.status(404).json({ error: "Chưa có thông tin cho Tour!" });
+
+            const destination = await Destination.findOne({
+                where: {
+                  MaDiemDen: tourInformation.MaDiemDen
+                }
+            });
+
+            const translatedInformation = {
+                MaTour: tourInformation.MaTour,
+                TenTour: tour.TenTour,
+                MaDiemDen: tourInformation.MaDiemDen,
+                TenDiemDen: destination.TenDiemDen,
+                DiemKhoiHanh: tourInformation.DiemKhoiHanh,
+                NgayKhoiHanh: tourInformation.NgayKhoiHanh,
+                NgayQuayVe: tourInformation.NgayQuayVe,
+                KhachSan: tourInformation.KhachSan === 1 ? "Có" : "Không",
+                SanBay: tourInformation.SanBay === 1 ? "Có" : "Không",
+                Wifi: tourInformation.Wifi === 1 ? "Có" : "Không",
+                BuaSang: tourInformation.BuaSang === 1 ? "Có" : "Không",
+                BaoHiem: tourInformation.BaoHiem === 1 ? "Có" : "Không",
+                PhuongTien: tourInformation.PhuongTien === 1 ? "Có" : "Không",
+                createdAt: tourInformation.createdAt,
+                updatedAt: tourInformation.updatedAt,
+            };
+
+            return res.status(200).json({ data: translatedInformation });
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
+
+
+
 }
 
 module.exports = new tours();

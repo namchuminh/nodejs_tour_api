@@ -9,7 +9,11 @@ const authorization = require("../middlewares/authorization.middleware.js");
 router.delete('/:id', auth, authorization, tours.remove);
 router.put('/:id', auth, authorization, upload.single('AnhChinh'), tours.edit);
 router.post('/', auth, authorization, upload.single('AnhChinh'), checkUploadedImage, tours.add);
+router.get('/:id', tours.detail);
 router.get('/', tours.index);
 
+// Route information Tour
+router.get('/:id/information', tours.detailInformation);
+router.post('/:id/information', auth, authorization, tours.addInformation);
 
 module.exports = router;
