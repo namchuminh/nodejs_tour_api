@@ -9,7 +9,7 @@ class tours {
         try {
             const { s } = req.query;
             let { page } = req.query;
-            const limit = 2;
+            const limit = 10;
             let offset = 0;
 
             if(page){
