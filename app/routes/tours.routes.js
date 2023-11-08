@@ -17,4 +17,9 @@ router.get('/:id/information', tours.detailInformation);
 router.post('/:id/information', auth, authorization, tours.addInformation);
 router.put('/:id/information', auth, authorization, tours.editInformation);
 
+// Route policy Tour
+router.get('/:id/policy', tours.detailPolicy);
+router.post('/:id/policy', auth, authorization, tours.addPolicy);
+router.put('/:id/policy', auth, authorization, tours.editPolicy);
+
 module.exports = router;

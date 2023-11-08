@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const Tours = require("../models/tour.model.js");
 const TourInformation = require("../models/thongtintour.model.js");
 const Destination = require("../models/diemden.model.js");
+const TourPolicy = require("../models/noiquytour.model.js");
 
 class tours {
     //[GET] /tours
@@ -306,7 +307,7 @@ class tours {
                 updatedAt: Information.updatedAt,
             };
 
-            return res.status(200).json({ data: translatedInformation });
+            return res.status(201).json({ data: translatedInformation });
 
         }catch (error) {
             res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
@@ -410,7 +411,175 @@ class tours {
         }
     }
 
+    //[GET] /tours/:id/policy
+    async detailPolicy(req, res) {
+        try{
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+
+            const tourPolicy = await TourPolicy.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(!tourPolicy) return res.status(404).json({ error: "Chưa có thông tin nội quy cho Tour!" });
+
+            const destination = await Destination.findOne({
+                where: {
+                    MaDiemDen: tour.MaDiemDen
+                }
+            });
+
+            const translatedData = {
+                MaTour: tour.MaTour,
+                TenTour: tour.TenTour,
+                TenDiemDen: destination.TenDiemDen,
+                TrangPhuc: tourPolicy.TrangPhuc,
+                DoDung: tourPolicy.DoDung,
+                DoTuoi: tourPolicy.DoTuoi,
+                NoiQuyKhac: tourPolicy.NoiQuyKhac,
+                createdAt: tourPolicy.createdAt,
+                updatedAt: tourPolicy.updatedAt,
+            };
+
+            return res.status(200).json({ data: translatedData });
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
+
+    //[POST] /tours/:id/policy
+    async addPolicy(req, res) {
+        try{
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+
+            const tourPolicy = await TourPolicy.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(tourPolicy) return res.status(404).json({ error: "Tour này đã được thêm thông tin nội quy, vui lòng cập nhật nội quy!" });
+
+            const {TrangPhuc,DoDung,DoTuoi,NoiQuyKhac} = req.body;
+            if(!TrangPhuc || !DoDung || !DoTuoi || !NoiQuyKhac){
+                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin nội quy cho Tour!" });
+            }
+
+            if(!/^[0-9]+$/.test(DoTuoi)) return res.status(400).json({ error: "Độ tuổi phải là một số!" });
+
+            const createdTourPolicy = await TourPolicy.create({TrangPhuc,DoDung,DoTuoi,NoiQuyKhac,MaTour:id});
+
+            if(!createdTourPolicy) return res.status(400).json({ error: "Thêm thông tin nội quy Tour thất bại, vui lòng thử lại!" });
+
+
+            const destination = await Destination.findOne({
+                where: {
+                    MaDiemDen: tour.MaDiemDen
+                }
+            });
+
+            const translatedData = {
+                MaTour: tour.MaTour,
+                TenTour: tour.TenTour,
+                TenDiemDen: destination.TenDiemDen,
+                TrangPhuc: TrangPhuc,
+                DoDung: DoDung,
+                DoTuoi: DoTuoi,
+                NoiQuyKhac: NoiQuyKhac,
+                createdAt: createdTourPolicy.createdAt,
+                updatedAt: createdTourPolicy.updatedAt,
+            };
+
+            return res.status(201).json({ data: translatedData });
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
     
+    //[PUT] /tours/:id/policy
+    async editPolicy(req, res) {
+        try{
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+
+            const tourPolicy = await TourPolicy.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(!tourPolicy) return res.status(404).json({ error: "Tour này chưa được thêm thông tin nội quy, vui lòng thêm nội quy!" });
+
+            const {TrangPhuc,DoDung,DoTuoi,NoiQuyKhac} = req.body;
+            if(!TrangPhuc || !DoDung || !DoTuoi || !NoiQuyKhac){
+                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin nội quy cho Tour!" });
+            }
+
+            if(!/^[0-9]+$/.test(DoTuoi)) return res.status(400).json({ error: "Độ tuổi phải là một số!" });
+
+            const updatedTourPolicy = await TourPolicy.update({TrangPhuc,DoDung,DoTuoi,NoiQuyKhac}, {
+                where: {
+                    MaTour:id
+                }
+            });
+
+            if(!updatedTourPolicy) return res.status(400).json({ error: "Cập nhật thông tin nội quy Tour thất bại, vui lòng thử lại!" });
+
+
+            const destination = await Destination.findOne({
+                where: {
+                    MaDiemDen: tour.MaDiemDen
+                }
+            });
+
+            const translatedData = {
+                MaTour: tour.MaTour,
+                TenTour: tour.TenTour,
+                TenDiemDen: destination.TenDiemDen,
+                TrangPhuc: TrangPhuc,
+                DoDung: DoDung,
+                DoTuoi: DoTuoi,
+                NoiQuyKhac: NoiQuyKhac,
+                createdAt: updatedTourPolicy.createdAt,
+                updatedAt: updatedTourPolicy.updatedAt,
+            };
+
+            return res.status(200).json({ data: translatedData });
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
+
 
 }
 
