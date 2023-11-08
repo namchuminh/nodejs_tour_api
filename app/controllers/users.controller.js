@@ -1,3 +1,4 @@
+const { Op } = require('sequelize'); 
 const KhachHang = require("../models/khachhang.model.js");
 const Blacklist = require("../models/blacklist.model.js");
 const jwt = require("jsonwebtoken");
@@ -98,42 +99,41 @@ class users {
     }
   }
 
-
   //[GET] /users
   async index(req, res) {
     try {
-      const { s } = req.query;
-      let { page } = req.query;
-      const limit = 10;
-      let offset = 0;
+        const { s } = req.query;
+        let { page } = req.query;
+        const limit = 10;
+        let offset = 0;
 
-      if(page){
-          if(page <= 0){
-              page = 1;
-          }
-          offset = (page - 1) * limit;
-      }
-      
-      let data;
+        if(page){
+            if(page <= 0){
+                page = 1;
+            }
+            offset = (page - 1) * limit;
+        }
+        
+        let data;
 
-      if (s) {
-          data = await KhachHang.findAndCountAll({
-              where: { TenKhachHang: { [Op.like]: '%' + s + '%' } },
-              limit,
-              offset,
-          });
-      } else {
-          data = await KhachHang.findAndCountAll({ limit, offset, order: [['MaKhachHang', 'DESC']], });
-      }
+        if (s) {
+            data = await KhachHang.findAndCountAll({
+                where: { TenKhachHang: { [Op.like]: '%' + s + '%' } },
+                limit,
+                offset,
+                attributes: { exclude: ['MatKhau'] }
+            });
+        } else {
+            data = await KhachHang.findAndCountAll({ limit, offset, order: [['MaKhachHang', 'DESC']], attributes: { exclude: ['MatKhau'] }});
+        }
 
-      const totalPages = Math.ceil(data.count / limit);
-      return res.status(200).json({ data: data.rows, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
-  } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "Đã xảy ra lỗi" });
+        const totalPages = Math.ceil(data.count / limit);
+        return res.status(200).json({ data: data.rows, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Đã xảy ra lỗi" });
+    }
   }
-  }
-
 
   //[GET] /users/:id
   async detailUser(req, res) {
@@ -158,8 +158,62 @@ class users {
     }
   }
 
+  //[UPDATE] /users/:id
+  async editUser(req, res) {
+    try {
+      const {id} = req.params;
 
+      if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
 
+      if(req.user.ChucVu == 0 && req.user.MaKhachHang != id) return res.status(403).json({ error: "Không được phép!" });
+
+      const user = await KhachHang.findOne({
+        where: {
+          MaKhachHang:id
+        }
+      });
+
+      if (!user) return res.status(400).json({ error: "Không tồn tại khách hàng!" });
+
+      const {TenKhachHang,Email,SoDienThoai,MatKhau,XacNhanMatKhau} = req.body;
+
+      if(!TenKhachHang || !Email || !SoDienThoai ){
+        return res.status(400).json({ error: "Vui lòng nhập đủ thông tin khách hàng!" });
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Email)) return res.status(400).json({ error: "Email không hợp lệ!" });
+
+      if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(SoDienThoai)) return res.status(400).json({ error: "Số điện thoại không hợp lệ!" });
+
+      if(MatKhau){
+        if (MatKhau !== XacNhanMatKhau) return res.status(400).json({ error: "Mật khẩu không trùng khớp!" });
+        const updatedUser = await KhachHang.update({TenKhachHang,Email,SoDienThoai,MatKhau: md5(MatKhau)}, {
+          where: {
+            MaKhachHang: id,
+          },
+        });
+        if(!updatedUser) return res.status(400).json({ error: "Cập nhật thông tin khách hàng thất bại, vui lòng thử lại!" });
+      }else if(!MatKhau){
+        const updatedUser = await KhachHang.update({TenKhachHang,Email,SoDienThoai}, {
+          where: {
+            MaKhachHang: id,
+          },
+        });
+        if(!updatedUser) return res.status(400).json({ error: "Cập nhật thông tin khách hàng thất bại, vui lòng thử lại!" });
+      }
+
+      const userUpdated = await KhachHang.findOne({
+        where: {
+          MaKhachHang:id
+        },
+        attributes: { exclude: ['MatKhau'] }
+      });
+
+      return res.status(200).json({ data: userUpdated });
+    } catch (error) {
+      return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
+    }
+  }
 }
 
 module.exports = new users();
