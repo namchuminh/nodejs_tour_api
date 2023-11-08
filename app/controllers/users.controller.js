@@ -56,15 +56,15 @@ class users {
   //[POST] /users/register
   async register(req, res) {
     try {
-      const { TenKhachHang,Email,SoDienThoai,TaiKhoan,MatKhau } = req.body;
+      const { TenKhachHang, Email, SoDienThoai, TaiKhoan, MatKhau } = req.body;
 
-      if(!TenKhachHang || !Email || !SoDienThoai || !TaiKhoan || !MatKhau){
+      if (!TenKhachHang || !Email || !SoDienThoai || !TaiKhoan || !MatKhau) {
         return res.status(400).json({ error: "Vui lòng nhập đủ thông tin!" });
       }
 
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Email)) return res.status(400).json({ error: "Email không hợp lệ!" });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Email)) return res.status(400).json({ error: "Email không hợp lệ!" });
 
-      if(!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(SoDienThoai)) return res.status(400).json({ error: "Số điện thoại không hợp lệ!" });
+      if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(SoDienThoai)) return res.status(400).json({ error: "Số điện thoại không hợp lệ!" });
 
       const emailCheck = await KhachHang.findOne({
         where: {
@@ -84,19 +84,45 @@ class users {
         }
       });
 
-      if(emailCheck) return res.status(400).json({ error: "Email đã tồn tại!" });
-      if(soDienThoaiCheck) return res.status(400).json({ error: "Số điện thoại đã tồn tại!" });
-      if(taiKhoanCheck) return res.status(400).json({ error: "Tài khoản đã tồn tại!" });
+      if (emailCheck) return res.status(400).json({ error: "Email đã tồn tại!" });
+      if (soDienThoaiCheck) return res.status(400).json({ error: "Số điện thoại đã tồn tại!" });
+      if (taiKhoanCheck) return res.status(400).json({ error: "Tài khoản đã tồn tại!" });
 
-      if(await KhachHang.create({ TenKhachHang,Email,SoDienThoai,TaiKhoan,MatKhau:md5(MatKhau),TrangThai:1 })){
+      if (await KhachHang.create({ TenKhachHang, Email, SoDienThoai, TaiKhoan, MatKhau: md5(MatKhau), TrangThai: 1 })) {
         return res.status(201).json({ error: "Đăng ký tài khoản thành công!" });
-      }else{
+      } else {
         return res.status(400).json({ error: "Có lỗi khi đăng ký tài khoản!" });
       }
     } catch (error) {
       return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
     }
   }
+
+  //[GET] /users/:id
+  async detailUser(req, res) {
+    try {
+      const {id} = req.params;
+
+      if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+      if(req.user.ChucVu == 0 && req.user.MaKhachHang != id) return res.status(403).json({ error: "Không được phép!" });
+
+      const user = await KhachHang.findOne({
+        where: {
+          MaKhachHang:id
+        }
+      });
+
+      if (!user) return res.status(400).json({ error: "Không tồn tại khách hàng!" });
+
+      return res.status(200).json({ data: user });
+    } catch (error) {
+      return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
+    }
+  }
+
+
+
 }
 
 module.exports = new users();
