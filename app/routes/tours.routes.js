@@ -15,5 +15,6 @@ router.get('/', tours.index);
 // Route information Tour
 router.get('/:id/information', tours.detailInformation);
 router.post('/:id/information', auth, authorization, tours.addInformation);
+router.put('/:id/information', auth, authorization, tours.editInformation);
 
 module.exports = router;

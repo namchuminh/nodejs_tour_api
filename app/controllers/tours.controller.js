@@ -313,6 +313,105 @@ class tours {
         }
     }
 
+    //[PUT] /tours/:id/information
+    async editInformation(req, res) {
+        try{
+            const {id} = req.params
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                  MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+
+            const tourInformation = await TourInformation.findOne({
+                where: {
+                  MaTour: id
+                }
+            });
+
+            if(!tourInformation) return res.status(404).json({ error: "Chưa có thông tin cho Tour!" });
+
+            const {MaDiemDen,DiemKhoiHanh,NgayKhoiHanh,NgayQuayVe,KhachSan,SanBay,Wifi,BuaSang,BaoHiem,PhuongTien} = req.body;
+            if(!MaDiemDen || !DiemKhoiHanh || !NgayKhoiHanh || !NgayQuayVe || !KhachSan || !SanBay || !Wifi || !BuaSang || !BaoHiem || !PhuongTien){
+                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin cho Tour!" });
+            }
+
+            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ error: "Mã điểm đến phải là một số!" });
+            if(!await Destination.findOne({ where: { MaDiemDen } })) return res.status(400).json({ error: "Mã điểm đến không tồn tại!" });
+
+            if(!/^(Có|Không)$/.test(KhachSan)) return res.status(400).json({ error: "Thông tin khách sạn phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(SanBay)) return res.status(400).json({ error: "Thông tin sân bay phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(Wifi)) return res.status(400).json({ error: "Thông tin wifi phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(BuaSang)) return res.status(400).json({ error: "Thông tin bữa sáng phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(BaoHiem)) return res.status(400).json({ error: "Thông tin bảo hiểm phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(PhuongTien)) return res.status(400).json({ error: "Thông tin phương tiện phải là Có hoặc Không!" });
+
+            const newTourInformation = {
+                MaTour: id,
+                MaDiemDen,
+                DiemKhoiHanh,
+                NgayKhoiHanh,
+                NgayQuayVe,
+                KhachSan: KhachSan === "Có" ? 1 : 0,
+                SanBay: SanBay === "Có" ? 1 : 0,
+                Wifi: Wifi === "Có" ? 1 : 0,
+                BuaSang: BuaSang === "Có" ? 1 : 0,
+                BaoHiem: BaoHiem === "Có" ? 1 : 0,
+                PhuongTien: PhuongTien === "Có" ? 1 : 0,
+            }
+
+            const updatedTourInformation = await TourInformation.update(newTourInformation, {
+                where: {
+                    MaTour: id,
+                },
+            });
+
+            if(!updatedTourInformation) return res.status(400).json({ error: "Cập nhật thông tin Tour thất bại, vui lòng thử lại!" });
+
+            const Information = await TourInformation.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            const destination = await Destination.findOne({
+                where: {
+                    MaDiemDen
+                }
+            });
+
+            const translatedInformation = {
+                MaTour: Information.MaTour,
+                TenTour: tour.TenTour,
+                MaDiemDen: Information.MaDiemDen,
+                TenDiemDen: destination.TenDiemDen,
+                DiemKhoiHanh: Information.DiemKhoiHanh,
+                NgayKhoiHanh: Information.NgayKhoiHanh,
+                NgayQuayVe: Information.NgayQuayVe,
+                KhachSan: Information.KhachSan === 1 ? "Có" : "Không",
+                SanBay: Information.SanBay === 1 ? "Có" : "Không",
+                Wifi: Information.Wifi === 1 ? "Có" : "Không",
+                BuaSang: Information.BuaSang === 1 ? "Có" : "Không",
+                BaoHiem: Information.BaoHiem === 1 ? "Có" : "Không",
+                PhuongTien: Information.PhuongTien === 1 ? "Có" : "Không",
+                createdAt: Information.createdAt,
+                updatedAt: Information.updatedAt,
+            };
+
+            return res.status(200).json({ data: translatedInformation });
+
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
+
+    
+
 }
 
 module.exports = new tours();
