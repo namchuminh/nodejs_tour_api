@@ -98,6 +98,43 @@ class users {
     }
   }
 
+
+  //[GET] /users
+  async index(req, res) {
+    try {
+      const { s } = req.query;
+      let { page } = req.query;
+      const limit = 10;
+      let offset = 0;
+
+      if(page){
+          if(page <= 0){
+              page = 1;
+          }
+          offset = (page - 1) * limit;
+      }
+      
+      let data;
+
+      if (s) {
+          data = await KhachHang.findAndCountAll({
+              where: { TenKhachHang: { [Op.like]: '%' + s + '%' } },
+              limit,
+              offset,
+          });
+      } else {
+          data = await KhachHang.findAndCountAll({ limit, offset, order: [['MaKhachHang', 'DESC']], });
+      }
+
+      const totalPages = Math.ceil(data.count / limit);
+      return res.status(200).json({ data: data.rows, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Đã xảy ra lỗi" });
+  }
+  }
+
+
   //[GET] /users/:id
   async detailUser(req, res) {
     try {
