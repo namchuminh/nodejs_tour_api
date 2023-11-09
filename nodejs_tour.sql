@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 01, 2023 at 07:07 PM
+-- Generation Time: Nov 09, 2023 at 07:07 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -40,7 +40,10 @@ CREATE TABLE `blacklist` (
 
 INSERT INTO `blacklist` (`id`, `token`, `createdAt`, `updatedAt`) VALUES
 (11, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYU5oYW5WaWVuIjoxLCJpYXQiOjE2OTg4NTU1NjEsImV4cCI6MTY5ODk0MTk2MX0.dc3DAzaXF5RPGmD3278HYY_uxbxdPBB46M-7vd6CZTA', '2023-11-01 16:19:27', '2023-11-01 16:19:27'),
-(12, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYU5oYW5WaWVuIjoxLCJDaHVjVnUiOjEsImlhdCI6MTY5ODg1OTEyMSwiZXhwIjoxNjk4OTQ1NTIxfQ.VL0CBCZASiM1ut8yRkxSD4r_IUDQMkCo4YyCfm75Tos', '2023-11-01 17:19:03', '2023-11-01 17:19:03');
+(12, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYU5oYW5WaWVuIjoxLCJDaHVjVnUiOjEsImlhdCI6MTY5ODg1OTEyMSwiZXhwIjoxNjk4OTQ1NTIxfQ.VL0CBCZASiM1ut8yRkxSD4r_IUDQMkCo4YyCfm75Tos', '2023-11-01 17:19:03', '2023-11-01 17:19:03'),
+(13, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYU5oYW5WaWVuIjoxLCJDaHVjVnUiOjEsImlhdCI6MTY5ODg2NDY1NSwiZXhwIjoxNjk4OTUxMDU1fQ.--w8GrrokgDLEbVgXys2xfEI5Vw3-4_Ur7AAc90vHU8', '2023-11-01 18:58:01', '2023-11-01 18:58:01'),
+(14, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYU5oYW5WaWVuIjoxLCJDaHVjVnUiOjEsImlhdCI6MTY5ODg3MjU5MSwiZXhwIjoxNjk4OTU4OTkxfQ.L7mkl7zP_uaclXla2FLA3hfw3MwtrEerdbPzCaUGdm4', '2023-11-01 21:03:30', '2023-11-01 21:03:30'),
+(15, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYUtoYWNoSGFuZyI6MSwiQ2h1Y1Z1IjowLCJpYXQiOjE2OTg4NzUwMzUsImV4cCI6MTY5ODk2MTQzNX0.NPFJ0V7VSiasD5Nx3xYvGW2rVqVbgMg5zE-Ui04Ohbw', '2023-11-01 21:44:38', '2023-11-01 21:44:38');
 
 -- --------------------------------------------------------
 
@@ -98,10 +101,11 @@ INSERT INTO `diem_den` (`MaDiemDen`, `TenDiemDen`, `MoTa`, `AnhChinh`, `HinhAnh`
 
 CREATE TABLE `don_hang` (
   `MaDonHang` int(11) NOT NULL,
+  `MaTimKiem` varchar(255) NOT NULL,
   `MaTour` int(11) NOT NULL,
   `MaKhachHang` int(11) NOT NULL,
   `SoLuongVe` int(11) NOT NULL,
-  `GhiChu` int(11) NOT NULL,
+  `GhiChu` text NOT NULL,
   `TrangThai` int(11) NOT NULL DEFAULT 1,
   `PhuongThucThanhToan` int(11) NOT NULL DEFAULT 1,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
@@ -135,9 +139,19 @@ CREATE TABLE `khach_hang` (
   `SoDienThoai` varchar(11) NOT NULL,
   `TaiKhoan` text NOT NULL,
   `MatKhau` text NOT NULL,
+  `TrangThai` int(1) NOT NULL DEFAULT 1,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `khach_hang`
+--
+
+INSERT INTO `khach_hang` (`MaKhachHang`, `TenKhachHang`, `Email`, `SoDienThoai`, `TaiKhoan`, `MatKhau`, `TrangThai`, `createdAt`, `updatedAt`) VALUES
+(1, 'Nguyễn Văn A', 'nguyenvana@gmail.com', '0999999999', 'nguyenvana', '20ca70c7c8f494c7bd1d54ad23d40cde', 1, '2023-11-02 04:43:03', '2023-11-09 06:19:24'),
+(2, 'Nam Chu Minh', 'namchuminh@gmail.com', '0999886666', 'chuminhnam', '206dcce3f82cf8981d316e7900dc8e06', 1, '2023-11-02 01:45:45', '2023-11-09 06:44:49'),
+(3, 'Trần Ngọc Hà', 'tranngocha@gmail.com', '0388315968', 'tranngocha', '80e4119a697a73086b8501b6f453aef0', 1, '2023-11-02 01:47:08', '2023-11-09 06:52:32');
 
 -- --------------------------------------------------------
 
@@ -202,6 +216,13 @@ CREATE TABLE `thong_tin_tour` (
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+--
+-- Dumping data for table `thong_tin_tour`
+--
+
+INSERT INTO `thong_tin_tour` (`MaThongTinTour`, `MaDiemDen`, `DiemKhoiHanh`, `NgayKhoiHanh`, `NgayQuayVe`, `KhachSan`, `SanBay`, `Wifi`, `BuaSang`, `BaoHiem`, `PhuongTien`, `MaTour`, `createdAt`, `updatedAt`) VALUES
+(5, 2, 'Ba Vì, Hà Nội', '2023-11-08 00:35:00', '2023-11-15 10:35:00', 1, 1, 1, 0, 0, 1, 3, '2023-11-06 16:58:08', '2023-11-08 03:32:48');
+
 -- --------------------------------------------------------
 
 --
@@ -215,6 +236,7 @@ CREATE TABLE `tin_tuc` (
   `AnhChinh` text NOT NULL,
   `MaNhanVien` int(11) NOT NULL,
   `MaChuyenMuc` int(11) NOT NULL,
+  `DuongDan` text NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -244,8 +266,6 @@ CREATE TABLE `tours` (
 --
 
 INSERT INTO `tours` (`MaTour`, `TenTour`, `MoTa`, `GiaVe`, `SoLuongVe`, `MaDiemDen`, `AnhChinh`, `DuongDan`, `MaNhanVien`, `createdAt`, `updatedAt`) VALUES
-(1, 'Biển Đà Nẵng', 'Biển Đà Nẵng', 100000, 10, 1, 'https://i1-dulich.vnecdn.net/2022/06/01/CauVangDaNang-1654082224-7229-1654082320.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=MeVMb72UZA27ivcyB3s7Kg', 'du-lich-bien-da-nag', 1, '2023-11-02 00:31:00', '2023-11-01 18:27:39'),
-(2, 'Núi Ngũ Hành Sơn', 'Núi Ngũ Hành Sơn', 100000, 10, 1, 'https://i1-dulich.vnecdn.net/2022/06/01/CauVangDaNang-1654082224-7229-1654082320.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=MeVMb72UZA27ivcyB3s7Kg', 'du-lich-nui-ngu-hanh-son', 1, '2023-11-02 00:32:28', '0000-00-00 00:00:00'),
 (3, 'Cát Bà - Hải Phòng', 'Du lịch huyện đảo Cát Bà - Hải Phòng', 150000, 15, 2, 'https://haiphong.gov.vn/upload/haiphong/product/2020/10/6c2a27c4e9d617884ec7-1458d2ddfe164132b95ec163ccc8e4ea.jpg', 'du-lich-cat-ba-hai-phong', 1, '2023-11-02 01:01:07', '2023-11-02 01:01:07'),
 (4, 'Thành Phố Hải Phòng', 'Du lịch TP.Hải Phòng', 150000, 15, 2, 'https://haiphong.gov.vn/upload/haiphong/product/2020/10/6c2a27c4e9d617884ec7-1458d2ddfe164132b95ec163ccc8e4ea.jpg', 'du-lich-thanh-pho-hai-phong', 1, '2023-11-02 01:01:54', '2023-11-02 01:01:54');
 
@@ -338,7 +358,7 @@ ALTER TABLE `tours`
 -- AUTO_INCREMENT for table `blacklist`
 --
 ALTER TABLE `blacklist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `chuyen_muc`
@@ -356,19 +376,19 @@ ALTER TABLE `diem_den`
 -- AUTO_INCREMENT for table `don_hang`
 --
 ALTER TABLE `don_hang`
-  MODIFY `MaDonHang` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `MaDonHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `hinh_anh_tour`
 --
 ALTER TABLE `hinh_anh_tour`
-  MODIFY `MaHinhAnh` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `MaHinhAnh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `khach_hang`
 --
 ALTER TABLE `khach_hang`
-  MODIFY `MaKhachHang` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `MaKhachHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `nhan_vien`
@@ -380,13 +400,13 @@ ALTER TABLE `nhan_vien`
 -- AUTO_INCREMENT for table `noi_quy_tour`
 --
 ALTER TABLE `noi_quy_tour`
-  MODIFY `MaNoiQuy` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `MaNoiQuy` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `thong_tin_tour`
 --
 ALTER TABLE `thong_tin_tour`
-  MODIFY `MaThongTinTour` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `MaThongTinTour` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tin_tuc`
@@ -398,11 +418,17 @@ ALTER TABLE `tin_tuc`
 -- AUTO_INCREMENT for table `tours`
 --
 ALTER TABLE `tours`
-  MODIFY `MaTour` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `MaTour` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `diem_den`
+--
+ALTER TABLE `diem_den`
+  ADD CONSTRAINT `diem_den_ibfk_1` FOREIGN KEY (`MaChuyenMuc`) REFERENCES `chuyen_muc` (`MaChuyenMuc`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `don_hang`
