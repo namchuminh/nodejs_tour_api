@@ -1,5 +1,7 @@
 const { Op } = require('sequelize'); 
 const Categories = require("../models/chuyenmuc.model.js");
+const Destination = require("../models/diemden.model.js");
+const News = require("../models/tintuc.model.js");
 
 class categories {
     //[GET] /categories
@@ -126,6 +128,14 @@ class categories {
             });
 
             if(!categories) return res.status(404).json({ error: "Không tìm thấy chuyên mục!" });
+
+            if(await Destination.findOne({where: {MaChuyenMuc: categories.MaChuyenMuc}})){
+                return res.status(400).json({ error: "Tồn tại điểm đến thuộc chuyên mục này, không được phép xóa!" });
+            }
+
+            if(await News.findOne({where: {MaChuyenMuc: categories.MaChuyenMuc}})){
+                return res.status(400).json({ error: "Tồn tại tin tức thuộc chuyên mục này, không được phép xóa!" });
+            }
             
             const categoriesDeleted = await Categories.destroy({ where: { MaChuyenMuc: id } });
 
