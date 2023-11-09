@@ -3,6 +3,7 @@ const Tours = require("../models/tour.model.js");
 const TourInformation = require("../models/thongtintour.model.js");
 const Destination = require("../models/diemden.model.js");
 const TourPolicy = require("../models/noiquytour.model.js");
+const TourGallery = require("../models/hinhanhtour.model.js");
 
 class tours {
     //[GET] /tours
@@ -580,6 +581,134 @@ class tours {
         }
     }
 
+    //[GET] /tours/:id/gallery
+    async detailGallery(req, res) {
+        try{
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+
+            const tourGallery= await TourGallery.findAndCountAll({
+                where: {
+                    MaTour: id
+                },
+                attributes: { exclude: ['MaHinhAnh']}
+            });
+
+            const destination = await Destination.findOne({
+                where: {
+                    MaDiemDen: tour.MaDiemDen
+                }
+            });
+
+            const transformedData = tourGallery.rows.map(gallery => ({
+                MaTour: tour.MaTour,
+                TenTour: tour.TenTour,
+                TenDiemDen: destination.TenDiemDen,
+                ...gallery.toJSON()
+            }));
+
+            return res.status(200).json({ data: transformedData });
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
+
+    //[POST] /tours/:id/gallery
+    async addGallery(req, res) {
+        try{
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+
+            const destination = await Destination.findOne({
+                where: {
+                    MaDiemDen: tour.MaDiemDen
+                }
+            });
+
+            const transformedData = [];
+
+            await Promise.all(req.files.map(async (image) => {
+                let DuongDan = image.path.replace(/\\/g, "/");
+                const addImage = await TourGallery.create({ MaTour: id, DuongDan });
+                const dataInsert = {
+                    MaTour: tour.MaTour,
+                    TenTour: tour.TenTour,
+                    TenDiemDen: destination.TenDiemDen,
+                    DuongDan,
+                    createdAt: addImage.createdAt,
+                    updatedAt: addImage.updatedAt
+                };
+                transformedData.push(dataInsert);
+            }));
+
+            return res.status(200).json({ data: transformedData });
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
+
+    //[PUT] /tours/:id/gallery
+    async editGallery(req, res) {
+        try{
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+            const tour = await Tours.findOne({
+                where: {
+                    MaTour: id
+                }
+            });
+
+            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+
+            const destination = await Destination.findOne({
+                where: {
+                    MaDiemDen: tour.MaDiemDen
+                }
+            });
+
+            await TourGallery.destroy({ where: { MaTour: id } });
+
+            const transformedData = [];
+
+            await Promise.all(req.files.map(async (image) => {
+                let DuongDan = image.path.replace(/\\/g, "/");
+                const addImage = await TourGallery.create({ MaTour: id, DuongDan });
+                const dataInsert = {
+                    MaTour: tour.MaTour,
+                    TenTour: tour.TenTour,
+                    TenDiemDen: destination.TenDiemDen,
+                    DuongDan,
+                    createdAt: addImage.createdAt,
+                    updatedAt: addImage.updatedAt
+                };
+                transformedData.push(dataInsert);
+            }));
+
+            return res.status(200).json({ data: transformedData });
+        }catch (error) {
+            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
 
 }
 
