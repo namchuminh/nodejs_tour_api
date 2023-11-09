@@ -21,6 +21,10 @@ class users {
         return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu!" });
       }
 
+      if (khachhang.TrangThai == 0) {
+        return res.status(401).json({ message: "Tài khoản không được phép hoạt động!" });
+      }
+
       const accessToken = jwt.sign({ MaKhachHang: khachhang.MaKhachHang, ChucVu: 0 }, "SECRET_KEY", {
         expiresIn: "24h"
       });
@@ -121,17 +125,22 @@ class users {
                 where: { TenKhachHang: { [Op.like]: '%' + s + '%' } },
                 limit,
                 offset,
-                attributes: { exclude: ['MatKhau'] }
+                attributes: { exclude: ['MatKhau']}
             });
         } else {
             data = await KhachHang.findAndCountAll({ limit, offset, order: [['MaKhachHang', 'DESC']], attributes: { exclude: ['MatKhau'] }});
         }
 
+        const transformedData = data.rows.map(user => ({
+            ...user.toJSON(),
+            TrangThai: user.TrangThai == 1 ? "Hoạt động" : "Bị chặn"
+        }));
+
         const totalPages = Math.ceil(data.count / limit);
-        return res.status(200).json({ data: data.rows, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
+        return res.status(200).json({ data: transformedData, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Đã xảy ra lỗi" });
+        res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
     }
   }
 
@@ -152,7 +161,14 @@ class users {
 
       if (!user) return res.status(400).json({ error: "Không tồn tại khách hàng!" });
 
-      return res.status(200).json({ data: user });
+      if (user.TrangThai == 0) {
+        return res.status(403).json({ message: "Tài khoản không được phép hoạt động!" });
+      }
+
+      const transformedTrangThai = user.TrangThai === 1 ? 'Hoạt động' : 'Bị chặn';
+      const userWithAlias = { ...user.toJSON(), TrangThai: transformedTrangThai };
+
+      return res.status(200).json({ data: userWithAlias });
     } catch (error) {
       return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
     }
@@ -209,7 +225,53 @@ class users {
         attributes: { exclude: ['MatKhau'] }
       });
 
-      return res.status(200).json({ data: userUpdated });
+      const transformedTrangThai = userUpdated.TrangThai === 1 ? 'Hoạt động' : 'Bị chặn';
+      const userUpdatedWithAlias = { ...userUpdated.toJSON(), TrangThai: transformedTrangThai };
+
+      return res.status(200).json({ data: userUpdatedWithAlias });
+    } catch (error) {
+      return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
+    }
+  }
+
+  //[POST] /users/:id/block
+  async blockUser(req, res) {
+    try {
+      const {id} = req.params;
+
+      if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+
+      const user = await KhachHang.findOne({
+        where: {
+          MaKhachHang:id
+        }
+      });
+
+      if (!user) return res.status(400).json({ error: "Không tồn tại khách hàng!" });
+
+      const TrangThai = user.TrangThai == 1 ? 0 : 1;
+
+      const updatedUser = await KhachHang.update({TrangThai}, {
+        where: {
+          MaKhachHang: id,
+        },
+      });
+      
+      if (!updatedUser) return res.status(400).json({ error: TrangThai == 0 ? "Chặn khách hàng thất bại, vui lòng thử lại!" : "Bỏ chặn khách hàng thất bại, vui lòng thử lại!" });
+
+      const userUpdated = await KhachHang.findOne({
+        where: {
+          MaKhachHang:id
+        },
+        attributes: { 
+          exclude: ['MatKhau']
+        }
+      });
+
+      const transformedTrangThai = userUpdated.TrangThai === 1 ? 'Hoạt động' : 'Bị chặn';
+      const userUpdatedWithAlias = { ...userUpdated.toJSON(), TrangThai: transformedTrangThai };
+
+      return res.status(200).json({ data: userUpdatedWithAlias });
     } catch (error) {
       return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
     }

@@ -11,6 +11,9 @@ router.get('/:id', auth, users.detailUser);
 router.put('/:id', auth, users.editUser);
 router.get('/', auth, authorization, users.index);
 
+router.post('/:id/block', auth, users.blockUser);
+
+
 
 
 module.exports = router;
