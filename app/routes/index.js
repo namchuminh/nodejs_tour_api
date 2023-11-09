@@ -4,6 +4,7 @@ const Users = require("./users.routes.js");
 const Categories = require("./categories.routes.js");
 const News = require("./news.routes.js");
 const Destination = require("./destination.routes.js");
+const Orders = require("./orders.routes.js");
 
 function route(app){
     app.use("/admin", Admin)
@@ -12,6 +13,7 @@ function route(app){
     app.use("/categories", Categories)
     app.use("/news", News)
     app.use("/destination", Destination)
+    app.use("/orders", Orders)
 }
 
 module.exports = route

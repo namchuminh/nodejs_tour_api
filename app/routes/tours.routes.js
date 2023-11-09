@@ -15,5 +15,16 @@ router.get('/', tours.index);
 // Route information Tour
 router.get('/:id/information', tours.detailInformation);
 router.post('/:id/information', auth, authorization, tours.addInformation);
+router.put('/:id/information', auth, authorization, tours.editInformation);
+
+// Route policy Tour
+router.get('/:id/policy', tours.detailPolicy);
+router.post('/:id/policy', auth, authorization, tours.addPolicy);
+router.put('/:id/policy', auth, authorization, tours.editPolicy);
+
+// Route gallery Tour
+router.get('/:id/gallery', tours.detailGallery);
+router.post('/:id/gallery', auth, authorization, upload.array('HinhAnh'), checkUploadedImage, tours.addGallery);
+router.put('/:id/gallery', auth, authorization, upload.array('HinhAnh'), checkUploadedImage, tours.editGallery);
 
 module.exports = router;
