@@ -35,8 +35,8 @@ class tours {
 
             const totalPages = Math.ceil(data.count / limit);
             return res.status(200).json({ data: data.rows, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
-        } catch (error) {
-            console.log(error);
+        } catch (message) {
+            console.log(message);
             res.status(500).json({ message: "Đã xảy ra lỗi" });
         }
     }
@@ -46,7 +46,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -54,11 +54,11 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
                         
             return res.status(200).json({ data: tour });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -67,26 +67,26 @@ class tours {
         try{
             const {TenTour,MoTa,GiaVe,SoLuongVe,MaDiemDen,DuongDan} = req.body;
             if(!TenTour || !MoTa || !GiaVe || !SoLuongVe || !MaDiemDen || !DuongDan){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin Tour!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin Tour!" });
             }
 
-            if(!/^[0-9]+$/.test(GiaVe)) return res.status(400).json({ error: "Giá vé phải là một số!" });
+            if(!/^[0-9]+$/.test(GiaVe)) return res.status(400).json({ message: "Giá vé phải là một số!" });
 
-            if(!/^[0-9]+$/.test(SoLuongVe)) return res.status(400).json({ error: "Số lượng vé phải là một số!" });
+            if(!/^[0-9]+$/.test(SoLuongVe)) return res.status(400).json({ message: "Số lượng vé phải là một số!" });
 
-            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ error: "Vui lòng chọn điểm đến hợp lệ!" });
+            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ message: "Vui lòng chọn điểm đến hợp lệ!" });
 
             // Lấy đường dẫn lưu trữ file ảnh
             const AnhChinh = req.file.path.replace(/\\/g, "/");
                 
             const createdTour = await Tours.create({TenTour,MoTa,GiaVe,SoLuongVe,MaDiemDen,AnhChinh,DuongDan,MaNhanVien: req.user.MaNhanVien});
 
-            if(!createdTour) return res.status(400).json({ error: "Thêm Tour thất bại, vui lòng thử lại!" });
+            if(!createdTour) return res.status(400).json({ message: "Thêm Tour thất bại, vui lòng thử lại!" });
 
             return res.status(201).json({ data: createdTour });
 
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -96,7 +96,7 @@ class tours {
             const {TenTour,MoTa,GiaVe,SoLuongVe,MaDiemDen,DuongDan} = req.body;
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -104,17 +104,17 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             if(!TenTour || !MoTa || !GiaVe || !SoLuongVe || !MaDiemDen || !DuongDan){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin Tour!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin Tour!" });
             }
 
-            if(!/^[0-9]+$/.test(GiaVe)) return res.status(400).json({ error: "Giá vé phải là một số!" });
+            if(!/^[0-9]+$/.test(GiaVe)) return res.status(400).json({ message: "Giá vé phải là một số!" });
 
-            if(!/^[0-9]+$/.test(SoLuongVe)) return res.status(400).json({ error: "Số lượng vé phải là một số!" });
+            if(!/^[0-9]+$/.test(SoLuongVe)) return res.status(400).json({ message: "Số lượng vé phải là một số!" });
 
-            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ error: "Vui lòng chọn điểm đến hợp lệ!" });
+            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ message: "Vui lòng chọn điểm đến hợp lệ!" });
 
             if (!req.file) {
                 const updatedTour = await Tours.update({TenTour,MoTa,GiaVe,SoLuongVe,MaDiemDen,DuongDan}, {
@@ -123,7 +123,7 @@ class tours {
                     },
                 });
 
-                if(!updatedTour) return res.status(400).json({ error: "Cập nhật Tour thất bại, vui lòng thử lại!" });
+                if(!updatedTour) return res.status(400).json({ message: "Cập nhật Tour thất bại, vui lòng thử lại!" });
             }else{
                 // Lấy đường dẫn lưu trữ file ảnh
                 const AnhChinh = req.file.path.replace(/\\/g, "/");
@@ -134,13 +134,13 @@ class tours {
                     },
                 });
 
-                if(!updatedTour) return res.status(400).json({ error: "Cập nhật Tour thất bại, vui lòng thử lại!" });
+                if(!updatedTour) return res.status(400).json({ message: "Cập nhật Tour thất bại, vui lòng thử lại!" });
             }
 
             const tourUpdated = await Tours.findOne({ where: { MaTour: id } });
             return res.status(200).json({ data: tourUpdated });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -149,7 +149,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -157,15 +157,15 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
             
             const tourDeleted = await Tours.destroy({ where: { MaTour: id } });
 
-            if(!tourDeleted) return res.status(404).json({ error: "Xóa Tour không thành công, vui lòng thử lại!" });
+            if(!tourDeleted) return res.status(404).json({ message: "Xóa Tour không thành công, vui lòng thử lại!" });
             
             return res.status(200).json({ data: tour });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -174,7 +174,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -182,7 +182,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const tourInformation = await TourInformation.findOne({
                 where: {
@@ -190,7 +190,7 @@ class tours {
                 }
             });
 
-            if(!tourInformation) return res.status(404).json({ error: "Chưa có thông tin cho Tour!" });
+            if(!tourInformation) return res.status(404).json({ message: "Chưa có thông tin cho Tour!" });
 
             const destination = await Destination.findOne({
                 where: {
@@ -217,8 +217,8 @@ class tours {
             };
 
             return res.status(200).json({ data: translatedInformation });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -227,7 +227,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -235,7 +235,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const tourInformation = await TourInformation.findOne({
                 where: {
@@ -243,22 +243,22 @@ class tours {
                 }
             });
 
-            if(tourInformation) return res.status(404).json({ error: "Tour này đã được thêm thông tin, vui lòng cập nhật thông tin!" });
+            if(tourInformation) return res.status(404).json({ message: "Tour này đã được thêm thông tin, vui lòng cập nhật thông tin!" });
 
             const {MaDiemDen,DiemKhoiHanh,NgayKhoiHanh,NgayQuayVe,KhachSan,SanBay,Wifi,BuaSang,BaoHiem,PhuongTien} = req.body;
             if(!MaDiemDen || !DiemKhoiHanh || !NgayKhoiHanh || !NgayQuayVe || !KhachSan || !SanBay || !Wifi || !BuaSang || !BaoHiem || !PhuongTien){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin cho Tour!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin cho Tour!" });
             }
 
-            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ error: "Mã điểm đến phải là một số!" });
-            if(!await Destination.findOne({ where: { MaDiemDen } })) return res.status(400).json({ error: "Mã điểm đến không tồn tại!" });
+            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ message: "Mã điểm đến phải là một số!" });
+            if(!await Destination.findOne({ where: { MaDiemDen } })) return res.status(400).json({ message: "Mã điểm đến không tồn tại!" });
 
-            if(!/^(Có|Không)$/.test(KhachSan)) return res.status(400).json({ error: "Thông tin khách sạn phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(SanBay)) return res.status(400).json({ error: "Thông tin sân bay phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(Wifi)) return res.status(400).json({ error: "Thông tin wifi phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(BuaSang)) return res.status(400).json({ error: "Thông tin bữa sáng phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(BaoHiem)) return res.status(400).json({ error: "Thông tin bảo hiểm phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(PhuongTien)) return res.status(400).json({ error: "Thông tin phương tiện phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(KhachSan)) return res.status(400).json({ message: "Thông tin khách sạn phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(SanBay)) return res.status(400).json({ message: "Thông tin sân bay phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(Wifi)) return res.status(400).json({ message: "Thông tin wifi phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(BuaSang)) return res.status(400).json({ message: "Thông tin bữa sáng phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(BaoHiem)) return res.status(400).json({ message: "Thông tin bảo hiểm phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(PhuongTien)) return res.status(400).json({ message: "Thông tin phương tiện phải là Có hoặc Không!" });
 
             const newTourInformation = {
                 MaTour: id,
@@ -276,7 +276,7 @@ class tours {
 
             const createdTourInformation = await TourInformation.create(newTourInformation);
 
-            if(!createdTourInformation) return res.status(400).json({ error: "Thêm thông tin Tour thất bại, vui lòng thử lại!" });
+            if(!createdTourInformation) return res.status(400).json({ message: "Thêm thông tin Tour thất bại, vui lòng thử lại!" });
 
             const Information = await TourInformation.findOne({
                 where: {
@@ -310,8 +310,8 @@ class tours {
 
             return res.status(201).json({ data: translatedInformation });
 
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -320,7 +320,7 @@ class tours {
         try{
             const {id} = req.params
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -328,7 +328,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const tourInformation = await TourInformation.findOne({
                 where: {
@@ -336,22 +336,22 @@ class tours {
                 }
             });
 
-            if(!tourInformation) return res.status(404).json({ error: "Chưa có thông tin cho Tour!" });
+            if(!tourInformation) return res.status(404).json({ message: "Chưa có thông tin cho Tour!" });
 
             const {MaDiemDen,DiemKhoiHanh,NgayKhoiHanh,NgayQuayVe,KhachSan,SanBay,Wifi,BuaSang,BaoHiem,PhuongTien} = req.body;
             if(!MaDiemDen || !DiemKhoiHanh || !NgayKhoiHanh || !NgayQuayVe || !KhachSan || !SanBay || !Wifi || !BuaSang || !BaoHiem || !PhuongTien){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin cho Tour!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin cho Tour!" });
             }
 
-            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ error: "Mã điểm đến phải là một số!" });
-            if(!await Destination.findOne({ where: { MaDiemDen } })) return res.status(400).json({ error: "Mã điểm đến không tồn tại!" });
+            if(!/^[0-9]+$/.test(MaDiemDen)) return res.status(400).json({ message: "Mã điểm đến phải là một số!" });
+            if(!await Destination.findOne({ where: { MaDiemDen } })) return res.status(400).json({ message: "Mã điểm đến không tồn tại!" });
 
-            if(!/^(Có|Không)$/.test(KhachSan)) return res.status(400).json({ error: "Thông tin khách sạn phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(SanBay)) return res.status(400).json({ error: "Thông tin sân bay phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(Wifi)) return res.status(400).json({ error: "Thông tin wifi phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(BuaSang)) return res.status(400).json({ error: "Thông tin bữa sáng phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(BaoHiem)) return res.status(400).json({ error: "Thông tin bảo hiểm phải là Có hoặc Không!" });
-            if(!/^(Có|Không)$/.test(PhuongTien)) return res.status(400).json({ error: "Thông tin phương tiện phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(KhachSan)) return res.status(400).json({ message: "Thông tin khách sạn phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(SanBay)) return res.status(400).json({ message: "Thông tin sân bay phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(Wifi)) return res.status(400).json({ message: "Thông tin wifi phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(BuaSang)) return res.status(400).json({ message: "Thông tin bữa sáng phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(BaoHiem)) return res.status(400).json({ message: "Thông tin bảo hiểm phải là Có hoặc Không!" });
+            if(!/^(Có|Không)$/.test(PhuongTien)) return res.status(400).json({ message: "Thông tin phương tiện phải là Có hoặc Không!" });
 
             const newTourInformation = {
                 MaTour: id,
@@ -373,7 +373,7 @@ class tours {
                 },
             });
 
-            if(!updatedTourInformation) return res.status(400).json({ error: "Cập nhật thông tin Tour thất bại, vui lòng thử lại!" });
+            if(!updatedTourInformation) return res.status(400).json({ message: "Cập nhật thông tin Tour thất bại, vui lòng thử lại!" });
 
             const Information = await TourInformation.findOne({
                 where: {
@@ -407,8 +407,8 @@ class tours {
 
             return res.status(200).json({ data: translatedInformation });
 
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -417,7 +417,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -425,7 +425,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const tourPolicy = await TourPolicy.findOne({
                 where: {
@@ -433,7 +433,7 @@ class tours {
                 }
             });
 
-            if(!tourPolicy) return res.status(404).json({ error: "Chưa có thông tin nội quy cho Tour!" });
+            if(!tourPolicy) return res.status(404).json({ message: "Chưa có thông tin nội quy cho Tour!" });
 
             const destination = await Destination.findOne({
                 where: {
@@ -454,8 +454,8 @@ class tours {
             };
 
             return res.status(200).json({ data: translatedData });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -464,7 +464,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -472,7 +472,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const tourPolicy = await TourPolicy.findOne({
                 where: {
@@ -480,18 +480,18 @@ class tours {
                 }
             });
 
-            if(tourPolicy) return res.status(404).json({ error: "Tour này đã được thêm thông tin nội quy, vui lòng cập nhật nội quy!" });
+            if(tourPolicy) return res.status(404).json({ message: "Tour này đã được thêm thông tin nội quy, vui lòng cập nhật nội quy!" });
 
             const {TrangPhuc,DoDung,DoTuoi,NoiQuyKhac} = req.body;
             if(!TrangPhuc || !DoDung || !DoTuoi || !NoiQuyKhac){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin nội quy cho Tour!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin nội quy cho Tour!" });
             }
 
-            if(!/^[0-9]+$/.test(DoTuoi)) return res.status(400).json({ error: "Độ tuổi phải là một số!" });
+            if(!/^[0-9]+$/.test(DoTuoi)) return res.status(400).json({ message: "Độ tuổi phải là một số!" });
 
             const createdTourPolicy = await TourPolicy.create({TrangPhuc,DoDung,DoTuoi,NoiQuyKhac,MaTour:id});
 
-            if(!createdTourPolicy) return res.status(400).json({ error: "Thêm thông tin nội quy Tour thất bại, vui lòng thử lại!" });
+            if(!createdTourPolicy) return res.status(400).json({ message: "Thêm thông tin nội quy Tour thất bại, vui lòng thử lại!" });
 
 
             const destination = await Destination.findOne({
@@ -513,8 +513,8 @@ class tours {
             };
 
             return res.status(201).json({ data: translatedData });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
     
@@ -523,7 +523,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -531,7 +531,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const tourPolicy = await TourPolicy.findOne({
                 where: {
@@ -539,14 +539,14 @@ class tours {
                 }
             });
 
-            if(!tourPolicy) return res.status(404).json({ error: "Tour này chưa được thêm thông tin nội quy, vui lòng thêm nội quy!" });
+            if(!tourPolicy) return res.status(404).json({ message: "Tour này chưa được thêm thông tin nội quy, vui lòng thêm nội quy!" });
 
             const {TrangPhuc,DoDung,DoTuoi,NoiQuyKhac} = req.body;
             if(!TrangPhuc || !DoDung || !DoTuoi || !NoiQuyKhac){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin nội quy cho Tour!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin nội quy cho Tour!" });
             }
 
-            if(!/^[0-9]+$/.test(DoTuoi)) return res.status(400).json({ error: "Độ tuổi phải là một số!" });
+            if(!/^[0-9]+$/.test(DoTuoi)) return res.status(400).json({ message: "Độ tuổi phải là một số!" });
 
             const updatedTourPolicy = await TourPolicy.update({TrangPhuc,DoDung,DoTuoi,NoiQuyKhac}, {
                 where: {
@@ -554,7 +554,7 @@ class tours {
                 }
             });
 
-            if(!updatedTourPolicy) return res.status(400).json({ error: "Cập nhật thông tin nội quy Tour thất bại, vui lòng thử lại!" });
+            if(!updatedTourPolicy) return res.status(400).json({ message: "Cập nhật thông tin nội quy Tour thất bại, vui lòng thử lại!" });
 
 
             const destination = await Destination.findOne({
@@ -576,8 +576,8 @@ class tours {
             };
 
             return res.status(200).json({ data: translatedData });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -586,7 +586,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -594,7 +594,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const tourGallery= await TourGallery.findAndCountAll({
                 where: {
@@ -617,8 +617,8 @@ class tours {
             }));
 
             return res.status(200).json({ data: transformedData });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -627,7 +627,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -635,7 +635,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const destination = await Destination.findOne({
                 where: {
@@ -660,8 +660,8 @@ class tours {
             }));
 
             return res.status(200).json({ data: transformedData });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -670,7 +670,7 @@ class tours {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const tour = await Tours.findOne({
                 where: {
@@ -678,7 +678,7 @@ class tours {
                 }
             });
 
-            if(!tour) return res.status(404).json({ error: "Không tìm thấy Tour!" });
+            if(!tour) return res.status(404).json({ message: "Không tìm thấy Tour!" });
 
             const destination = await Destination.findOne({
                 where: {
@@ -705,8 +705,8 @@ class tours {
             }));
 
             return res.status(200).json({ data: transformedData });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 

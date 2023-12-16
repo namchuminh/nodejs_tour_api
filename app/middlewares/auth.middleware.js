@@ -3,12 +3,12 @@ const Blacklist = require("../models/blacklist.model.js");
 
 const auth = async (req, res, next) => {
     if(!req.header("Authorization")){
-        return res.status(401).json({ error: "Yêu cầu có Token!" });
+        return res.status(401).json({ message: "Yêu cầu có Token!" });
     }
     try {
         const token = req.header("Authorization").split(" ")[1];
         if (!token) {
-            return res.status(401).json({ error: "Yêu cầu có Token" });
+            return res.status(401).json({ message: "Yêu cầu có Token" });
         }
         const decoded = jwt.verify(token, "SECRET_KEY");
 

@@ -4,9 +4,14 @@ const orders = require('../controllers/orders.controller.js');
 const auth = require("../middlewares/auth.middleware.js");
 const authorization = require("../middlewares/authorization.middleware.js");
 
-router.delete('/:id', auth, authorization, orders.remove);
+
+router.post('/:id/cancel', auth, orders.cancel);
+
+
 router.post('/', auth, orders.add);
 router.get('/:id', auth, orders.detail);
-router.get('/', auth, authorization, orders.index);
+router.get('/', auth, orders.index);
+
+
 
 module.exports = router;

@@ -54,8 +54,8 @@ class destination {
 
             const totalPages = Math.ceil(data.count / limit);
             return res.status(200).json({ data: transformedData, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
-        } catch (error) {
-            console.log(error);
+        } catch (message) {
+            console.log(message);
             res.status(500).json({ message: "Đã xảy ra lỗi" });
         }
     }
@@ -65,7 +65,7 @@ class destination {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const destination = await Destination.findOne({
                 where: {
@@ -79,7 +79,7 @@ class destination {
                 }
             });
 
-            if(!destination) return res.status(404).json({ error: "Không tìm thấy điểm đến!" });
+            if(!destination) return res.status(404).json({ message: "Không tìm thấy điểm đến!" });
                     
             const data = {
                 MaDiemDen: destination.MaDiemDen,
@@ -95,8 +95,8 @@ class destination {
             }
 
             return res.status(200).json({ data });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -105,11 +105,11 @@ class destination {
         try{
             const {TenDiemDen,MoTa,MaChuyenMuc,GoogleMap} = req.body;
             if(!TenDiemDen || !MoTa || !MaChuyenMuc || !GoogleMap){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin điểm đến!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin điểm đến!" });
             }
 
-            if(!/^[0-9]+$/.test(MaChuyenMuc)) return res.status(400).json({ error: "Vui lòng chọn mã chuyên mục!" });
-            if(!await Categories.findOne({ where: { MaChuyenMuc } })) return res.status(400).json({ error: "Chuyên mục không tồn tại!" });
+            if(!/^[0-9]+$/.test(MaChuyenMuc)) return res.status(400).json({ message: "Vui lòng chọn mã chuyên mục!" });
+            if(!await Categories.findOne({ where: { MaChuyenMuc } })) return res.status(400).json({ message: "Chuyên mục không tồn tại!" });
 
             // Lấy đường dẫn lưu trữ file ảnh
             const AnhChinh = req.files[0].path.replace(/\\/g, "/");
@@ -124,12 +124,12 @@ class destination {
 
             const createdDestination = await Destination.create({TenDiemDen,MoTa,AnhChinh,HinhAnh: HinhAnh.slice(0,-1),GoogleMap,MaChuyenMuc});
 
-            if(!createdDestination) return res.status(400).json({ error: "Thêm điểm đến thất bại, vui lòng thử lại!" });
+            if(!createdDestination) return res.status(400).json({ message: "Thêm điểm đến thất bại, vui lòng thử lại!" });
 
             return res.status(201).json({ data: createdDestination });
 
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -138,7 +138,7 @@ class destination {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const destination = await Destination.findOne({
                 where: {
@@ -146,15 +146,15 @@ class destination {
                 }
             });
 
-            if(!destination) return res.status(404).json({ error: "Không tìm thấy điểm đến!" });
+            if(!destination) return res.status(404).json({ message: "Không tìm thấy điểm đến!" });
 
             const {TenDiemDen,MoTa,MaChuyenMuc,GoogleMap} = req.body;
             if(!TenDiemDen || !MoTa || !MaChuyenMuc || !GoogleMap){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin điểm đến!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin điểm đến!" });
             }
 
-            if(!/^[0-9]+$/.test(MaChuyenMuc)) return res.status(400).json({ error: "Vui lòng chọn mã chuyên mục!" });
-            if(!await Categories.findOne({ where: { MaChuyenMuc } })) return res.status(400).json({ error: "Chuyên mục không tồn tại!" });
+            if(!/^[0-9]+$/.test(MaChuyenMuc)) return res.status(400).json({ message: "Vui lòng chọn mã chuyên mục!" });
+            if(!await Categories.findOne({ where: { MaChuyenMuc } })) return res.status(400).json({ message: "Chuyên mục không tồn tại!" });
 
             if(req.files.length <= 0){
                 const destinationUpdated = await Destination.update({TenDiemDen,MoTa,MaChuyenMuc,GoogleMap}, {
@@ -215,8 +215,8 @@ class destination {
             }
 
             return res.status(200).json({ data });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -225,7 +225,7 @@ class destination {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const destination = await Destination.findOne({
                 where: {
@@ -233,19 +233,19 @@ class destination {
                 }
             });
 
-            if(!destination) return res.status(404).json({ error: "Không tìm thấy điểm đến!" });
+            if(!destination) return res.status(404).json({ message: "Không tìm thấy điểm đến!" });
 
             if(await Tour.findOne({where: {MaDiemDen: destination.MaDiemDen}}) || await TourInformation.findOne({where: {MaDiemDen: destination.MaDiemDen}})){
-                return res.status(400).json({ error: "Tồn tại Tour thuộc điểm đến này, không được phép xóa!" });
+                return res.status(400).json({ message: "Tồn tại Tour thuộc điểm đến này, không được phép xóa!" });
             }
 
             const destinationDeleted = await Destination.destroy({ where: { MaDiemDen: id } });
 
-            if(!destinationDeleted) return res.status(404).json({ error: "Xóa điểm đến không thành công, vui lòng thử lại!" });
+            if(!destinationDeleted) return res.status(404).json({ message: "Xóa điểm đến không thành công, vui lòng thử lại!" });
             
             return res.status(200).json({ data: destination });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 }

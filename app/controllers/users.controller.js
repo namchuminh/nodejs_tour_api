@@ -34,7 +34,7 @@ class users {
       });
 
       res.json({ accessToken, refreshToken });
-    } catch (error) {
+    } catch (message) {
       res.status(500).json({ message: "Đã xảy ra lỗi" });
     }
   }
@@ -53,7 +53,7 @@ class users {
       await Blacklist.create({ token: token });
 
       res.status(200).json({ message: "Đăng xuất thành công!" });
-    } catch (error) {
+    } catch (message) {
       res.status(500).json({ message: "Đã xảy ra lỗi" });
     }
   }
@@ -64,12 +64,12 @@ class users {
       const { TenKhachHang, Email, SoDienThoai, TaiKhoan, MatKhau } = req.body;
 
       if (!TenKhachHang || !Email || !SoDienThoai || !TaiKhoan || !MatKhau) {
-        return res.status(400).json({ error: "Vui lòng nhập đủ thông tin!" });
+        return res.status(400).json({ message: "Vui lòng nhập đủ thông tin!" });
       }
 
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Email)) return res.status(400).json({ error: "Email không hợp lệ!" });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Email)) return res.status(400).json({ message: "Email không hợp lệ!" });
 
-      if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(SoDienThoai)) return res.status(400).json({ error: "Số điện thoại không hợp lệ!" });
+      if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(SoDienThoai)) return res.status(400).json({ message: "Số điện thoại không hợp lệ!" });
 
       const emailCheck = await KhachHang.findOne({
         where: {
@@ -89,17 +89,17 @@ class users {
         }
       });
 
-      if (emailCheck) return res.status(400).json({ error: "Email đã tồn tại!" });
-      if (soDienThoaiCheck) return res.status(400).json({ error: "Số điện thoại đã tồn tại!" });
-      if (taiKhoanCheck) return res.status(400).json({ error: "Tài khoản đã tồn tại!" });
+      if (emailCheck) return res.status(400).json({ message: "Email đã tồn tại!" });
+      if (soDienThoaiCheck) return res.status(400).json({ message: "Số điện thoại đã tồn tại!" });
+      if (taiKhoanCheck) return res.status(400).json({ message: "Tài khoản đã tồn tại!" });
 
       if (await KhachHang.create({ TenKhachHang, Email, SoDienThoai, TaiKhoan, MatKhau: md5(MatKhau), TrangThai: 1 })) {
-        return res.status(201).json({ error: "Đăng ký tài khoản thành công!" });
+        return res.status(201).json({ message: "Đăng ký tài khoản thành công!" });
       } else {
-        return res.status(400).json({ error: "Có lỗi khi đăng ký tài khoản!" });
+        return res.status(400).json({ message: "Có lỗi khi đăng ký tài khoản!" });
       }
-    } catch (error) {
-      return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
+    } catch (message) {
+      return res.status(500).json({ message: "Đã xảy ra lỗi không xác định!" });
     }
   }
 
@@ -138,8 +138,8 @@ class users {
 
         const totalPages = Math.ceil(data.count / limit);
         return res.status(200).json({ data: transformedData, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
-    } catch (error) {
-        console.log(error);
+    } catch (message) {
+        console.log(message);
         res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
     }
   }
@@ -149,9 +149,9 @@ class users {
     try {
       const {id} = req.params;
 
-      if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+      if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
-      if(req.user.ChucVu == 0 && req.user.MaKhachHang != id) return res.status(403).json({ error: "Không được phép!" });
+      if(req.user.ChucVu == 0 && req.user.MaKhachHang != id) return res.status(403).json({ message: "Không được phép!" });
 
       const user = await KhachHang.findOne({
         where: {
@@ -159,7 +159,7 @@ class users {
         }
       });
 
-      if (!user) return res.status(400).json({ error: "Không tồn tại khách hàng!" });
+      if (!user) return res.status(400).json({ message: "Không tồn tại khách hàng!" });
 
       if (user.TrangThai == 0) {
         return res.status(403).json({ message: "Tài khoản không được phép hoạt động!" });
@@ -169,8 +169,8 @@ class users {
       const userWithAlias = { ...user.toJSON(), TrangThai: transformedTrangThai };
 
       return res.status(200).json({ data: userWithAlias });
-    } catch (error) {
-      return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
+    } catch (message) {
+      return res.status(500).json({ message: "Đã xảy ra lỗi không xác định!" });
     }
   }
 
@@ -179,9 +179,9 @@ class users {
     try {
       const {id} = req.params;
 
-      if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+      if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
-      if(req.user.ChucVu == 0 && req.user.MaKhachHang != id) return res.status(403).json({ error: "Không được phép!" });
+      if(req.user.ChucVu == 0 && req.user.MaKhachHang != id) return res.status(403).json({ message: "Không được phép!" });
 
       const user = await KhachHang.findOne({
         where: {
@@ -189,33 +189,33 @@ class users {
         }
       });
 
-      if (!user) return res.status(400).json({ error: "Không tồn tại khách hàng!" });
+      if (!user) return res.status(400).json({ message: "Không tồn tại khách hàng!" });
 
       const {TenKhachHang,Email,SoDienThoai,MatKhau,XacNhanMatKhau} = req.body;
 
       if(!TenKhachHang || !Email || !SoDienThoai ){
-        return res.status(400).json({ error: "Vui lòng nhập đủ thông tin khách hàng!" });
+        return res.status(400).json({ message: "Vui lòng nhập đủ thông tin khách hàng!" });
       }
 
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Email)) return res.status(400).json({ error: "Email không hợp lệ!" });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Email)) return res.status(400).json({ message: "Email không hợp lệ!" });
 
-      if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(SoDienThoai)) return res.status(400).json({ error: "Số điện thoại không hợp lệ!" });
+      if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(SoDienThoai)) return res.status(400).json({ message: "Số điện thoại không hợp lệ!" });
 
       if(MatKhau){
-        if (MatKhau !== XacNhanMatKhau) return res.status(400).json({ error: "Mật khẩu không trùng khớp!" });
+        if (MatKhau !== XacNhanMatKhau) return res.status(400).json({ message: "Mật khẩu không trùng khớp!" });
         const updatedUser = await KhachHang.update({TenKhachHang,Email,SoDienThoai,MatKhau: md5(MatKhau)}, {
           where: {
             MaKhachHang: id,
           },
         });
-        if(!updatedUser) return res.status(400).json({ error: "Cập nhật thông tin khách hàng thất bại, vui lòng thử lại!" });
+        if(!updatedUser) return res.status(400).json({ message: "Cập nhật thông tin khách hàng thất bại, vui lòng thử lại!" });
       }else if(!MatKhau){
         const updatedUser = await KhachHang.update({TenKhachHang,Email,SoDienThoai}, {
           where: {
             MaKhachHang: id,
           },
         });
-        if(!updatedUser) return res.status(400).json({ error: "Cập nhật thông tin khách hàng thất bại, vui lòng thử lại!" });
+        if(!updatedUser) return res.status(400).json({ message: "Cập nhật thông tin khách hàng thất bại, vui lòng thử lại!" });
       }
 
       const userUpdated = await KhachHang.findOne({
@@ -229,8 +229,8 @@ class users {
       const userUpdatedWithAlias = { ...userUpdated.toJSON(), TrangThai: transformedTrangThai };
 
       return res.status(200).json({ data: userUpdatedWithAlias });
-    } catch (error) {
-      return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
+    } catch (message) {
+      return res.status(500).json({ message: "Đã xảy ra lỗi không xác định!" });
     }
   }
 
@@ -239,7 +239,7 @@ class users {
     try {
       const {id} = req.params;
 
-      if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+      if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
       const user = await KhachHang.findOne({
         where: {
@@ -247,7 +247,7 @@ class users {
         }
       });
 
-      if (!user) return res.status(400).json({ error: "Không tồn tại khách hàng!" });
+      if (!user) return res.status(400).json({ message: "Không tồn tại khách hàng!" });
 
       const TrangThai = user.TrangThai == 1 ? 0 : 1;
 
@@ -257,7 +257,7 @@ class users {
         },
       });
       
-      if (!updatedUser) return res.status(400).json({ error: TrangThai == 0 ? "Chặn khách hàng thất bại, vui lòng thử lại!" : "Bỏ chặn khách hàng thất bại, vui lòng thử lại!" });
+      if (!updatedUser) return res.status(400).json({ message: TrangThai == 0 ? "Chặn khách hàng thất bại, vui lòng thử lại!" : "Bỏ chặn khách hàng thất bại, vui lòng thử lại!" });
 
       const userUpdated = await KhachHang.findOne({
         where: {
@@ -272,8 +272,8 @@ class users {
       const userUpdatedWithAlias = { ...userUpdated.toJSON(), TrangThai: transformedTrangThai };
 
       return res.status(200).json({ data: userUpdatedWithAlias });
-    } catch (error) {
-      return res.status(500).json({ error: "Đã xảy ra lỗi không xác định!" });
+    } catch (message) {
+      return res.status(500).json({ message: "Đã xảy ra lỗi không xác định!" });
     }
   }
 }

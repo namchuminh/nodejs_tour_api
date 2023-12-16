@@ -29,7 +29,7 @@ class admin {
       });
 
       res.json({ accessToken, refreshToken });
-    } catch (error) {
+    } catch (message) {
       res.status(500).json({ message: "Đã xảy ra lỗi" });
     }
   }
@@ -48,7 +48,7 @@ class admin {
       await Blacklist.create({ token: token });
 
       res.status(200).json({ message: "Đăng xuất thành công!" });
-    } catch (error) {
+    } catch (message) {
       res.status(500).json({ message: "Đã xảy ra lỗi" });
     }
   }

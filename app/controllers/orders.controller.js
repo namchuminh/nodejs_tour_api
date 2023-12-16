@@ -31,7 +31,12 @@ class orders {
                     attributes: { exclude: ['MaDonHang']}
                 });
             } else {
-                data = await Orders.findAndCountAll({ limit, offset, order: [['MaDonHang', 'DESC']], attributes: { exclude: ['MaDonHang']}});
+                if(req.user.ChucVu == 0 && req.user.MaKhachHang){
+                    data = await Orders.findAndCountAll({ where: { MaKhachHang: req.user.MaKhachHang }, limit, offset, order: [['MaDonHang', 'DESC']], attributes: { exclude: ['MaDonHang']}});
+                }else{
+                    data = await Orders.findAndCountAll({ limit, offset, order: [['MaDonHang', 'DESC']], attributes: { exclude: ['MaDonHang']}});
+                }
+                
             }
 
             const transformedData = [];
@@ -80,8 +85,8 @@ class orders {
 
             const totalPages = Math.ceil(data.count / limit);
             return res.status(200).json({ data: transformedData, totalPages, perPage: limit, totalRows: data.count, currentPage: page ? page : 1  });
-        } catch (error) {
-            console.log(error);
+        } catch (message) {
+            console.log(message);
             res.status(500).json({ message: "Đã xảy ra lỗi" });
         }
     }
@@ -91,7 +96,7 @@ class orders {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
             const orders = await Orders.findOne({
                 where: {
@@ -100,9 +105,9 @@ class orders {
                 attributes: { exclude: ['MaDonHang']}
             });
 
-            if(!orders) return res.status(404).json({ error: "Không tìm thấy đơn hàng!" });
+            if(!orders) return res.status(404).json({ message: "Không tìm thấy đơn đặt vé!" });
 
-            if(req.user.ChucVu == 0 && req.user.MaKhachHang != orders.MaKhachHang) return res.status(403).json({ data: {} });
+            if(req.user.ChucVu == 0 && req.user.MaKhachHang != orders.MaKhachHang) return res.status(403).json({ message: "Không được phép!" });
 
             let TrangThai = "Đang đợi duyệt";
             let PhuongThucThanhToan = "Tiền mặt";
@@ -147,8 +152,8 @@ class orders {
             const ordersWithAlias = { TenTour: tour.TenTour, TenDiemDen: destination.TenDiemDen,...orders.toJSON(), MaKhachHang: user, TrangThai, PhuongThucThanhToan };   
 
             return res.status(200).json({ data: ordersWithAlias });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
@@ -157,20 +162,20 @@ class orders {
         try{
             const {MaTour,SoLuongVe,GhiChu,PhuongThucThanhToan} = req.body;
             if(!MaTour || !SoLuongVe || !GhiChu || !PhuongThucThanhToan){
-                return res.status(400).json({ error: "Vui lòng nhập đủ thông tin đặt vé!" });
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin đặt vé!" });
             }
 
-            if(!/^[0-9]+$/.test(MaTour)) return res.status(400).json({ error: "Vui lòng chọn Tour cần đặt vé!" });
-            if(!/^[0-9]+$/.test(SoLuongVe)) return res.status(400).json({ error: "Số lượng vé phải là một số!" });
-            if(!/^(Tiền mặt|Chuyển khoản)$/.test(PhuongThucThanhToan)) return res.status(400).json({ error: "Vui lòng chọn phương thức thanh toán!" });
+            if(!/^[0-9]+$/.test(MaTour)) return res.status(400).json({ message: "Vui lòng chọn Tour cần đặt vé!" });
+            if(!/^[0-9]+$/.test(SoLuongVe)) return res.status(400).json({ message: "Số lượng vé phải là một số!" });
+            if(!/^(Tiền mặt|Chuyển khoản)$/.test(PhuongThucThanhToan)) return res.status(400).json({ message: "Vui lòng chọn phương thức thanh toán!" });
             
             const tour = await Tours.findOne({ where: { MaTour } });
 
-            if(!tour) return res.status(400).json({ error: "Không tồn tại Tour này, vui lòng đặt Tour khác!" });
+            if(!tour) return res.status(400).json({ message: "Không tồn tại Tour này, vui lòng đặt Tour khác!" });
 
-            if(tour.SoLuongVe <= 0) return res.status(400).json({ error: "Tour đã hết vé, vui lòng đặt Tour khác!" });
+            if(tour.SoLuongVe <= 0) return res.status(400).json({ message: "Tour đã hết vé, vui lòng đặt Tour khác!" });
 
-            if(SoLuongVe > tour.SoLuongVe) return res.status(400).json({ error: `Số lượng vé đặt không được phép lớn hơn ${tour.SoLuongVe} vé!` });
+            if(SoLuongVe > tour.SoLuongVe) return res.status(400).json({ message: `Số lượng vé đặt không được phép lớn hơn ${tour.SoLuongVe} vé!` });
 
             const randomBuffer = crypto.randomBytes(4);
 
@@ -189,7 +194,7 @@ class orders {
                
             const createdOrder = await Orders.create(dataUpdated);
 
-            if(!createdOrder) return res.status(400).json({ error: "Đặt vé cho Tour thất bại, vui lòng thử lại!" });
+            if(!createdOrder) return res.status(400).json({ message: "Đặt vé cho Tour thất bại, vui lòng thử lại!" });
 
             const SoLuongVeMoi = tour.SoLuongVe - SoLuongVe;
 
@@ -211,33 +216,38 @@ class orders {
             const updateOrdersWithAlias = { TenTour: tour.TenTour, TenDiemDen: destination.TenDiemDen,...createdOrder.toJSON(), MaKhachHang: user, TrangThai: "Đang đợi duyệt", PhuongThucThanhToan };
 
             return res.status(201).json({ data: updateOrdersWithAlias });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 
-    //[DELETE] /orders/:id
-    async remove(req, res) {
+    //[POST] /orders/:id/cancel
+    async cancel(req, res) {
         try{
             const {id} = req.params;
 
-            if(!id) return res.status(400).json({ error: "Thiếu tham số!" });
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
 
-            const categories = await Categories.findOne({
+            const orders = await Orders.findOne({
                 where: {
-                    MaChuyenMuc: id
+                    MaTimKiem: id
                 }
             });
 
-            if(!categories) return res.status(404).json({ error: "Không tìm thấy chuyên mục!" });
-            
-            const categoriesDeleted = await Categories.destroy({ where: { MaChuyenMuc: id } });
+            if(!orders) return res.status(404).json({ message: "Không tìm thấy đơn đặt vé!" });
 
-            if(!categoriesDeleted) return res.status(404).json({ error: "Xóa chuyên mục không thành công, vui lòng thử lại!" });
-            
-            return res.status(200).json({ data: categories });
-        }catch (error) {
-            res.status(500).json({ error: "Đã xảy ra lỗi chưa xác định!" });
+            if(req.user.ChucVu == 0 && req.user.MaKhachHang != orders.MaKhachHang) return res.status(403).json({ message: "Không được phép!" });
+
+            const cancelOrders = await Orders.update({TrangThai: 0}, {
+                where: {
+                    MaTimKiem: id,
+                },
+            });
+
+            return res.status(200).json({ message: "Hủy đơn đặt vé thành công!" });
+
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
 }
