@@ -6,6 +6,7 @@ const authorization = require("../middlewares/authorization.middleware.js");
 
 
 router.post('/:id/cancel', auth, orders.cancel);
+router.post('/:id/status', auth, authorization, orders.status);
 
 
 router.post('/', auth, orders.add);

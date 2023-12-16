@@ -250,5 +250,40 @@ class orders {
             res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
         }
     }
+
+
+    //[POST] /orders/:id/status
+    async status(req, res) {
+        try{
+            const {TrangThai} = req.body;
+            const {id} = req.params;
+
+            if(!id) return res.status(400).json({ message: "Thiếu tham số!" });
+
+            const orders = await Orders.findOne({
+                where: {
+                    MaTimKiem: id
+                }
+            });
+
+            if(!orders) return res.status(404).json({ message: "Không tìm thấy đơn đặt vé!" });
+
+            if(!TrangThai) return res.status(400).json({ message: "Vui lòng chọn trạng thái của đơn đặt vé!" });
+
+            //1. Đang chờ duyệt vé, 2. Đã duyệt vé, 3. Đang gửi vé, 4. Đã gửi vé
+            if(TrangThai != 1 && TrangThai != 2 && TrangThai != 3 && TrangThai != 4) return res.status(400).json({ message: "Trạng thái của đơn đặt vé không hợp lệ!" });
+
+            const statusOrders = await Orders.update({TrangThai}, {
+                where: {
+                    MaTimKiem: id,
+                },
+            });
+
+            return res.status(200).json({ message: "Cập nhật trạng thái đơn đặt vé thành công!" });
+
+        }catch (message) {
+            res.status(500).json({ message: "Đã xảy ra lỗi chưa xác định!" });
+        }
+    }
 }
 module.exports = new orders();
